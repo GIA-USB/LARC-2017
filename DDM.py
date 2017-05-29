@@ -44,10 +44,11 @@ def matchAndFind(imgQuery, kpQuery, desQuery, imgTrain, kpTrain, desTrain):
 
 imgTerraine = cv2.imread('Marcas/Marca Kanji.png',0) # Empty terraines zone marker 
 imgExchange = cv2.imread('Marcas/Marca L.png',0) # Exchange zone marker
-imgTank = cv2.imread('Marcas/Marca 5x5.png',0) # Milk tank marker
+imgTank = cv2.imread('Marcas/marker.png',0) # Milk tank marker
 
 # Initiate SIFT detector
-sift = cv2.xfeatures2d.SIFT_create()
+sift = cv2.xfeatures2d.SIFT_create(nOctaveLayers = 5, contrastThreshold = 0.04, edgeThreshold = 10,
+								   sigma = 1.6)
 
 # Find the keypoints and descriptors with SIFT
 kpTerraine, desTerraine = sift.detectAndCompute(imgTerraine,None)
@@ -62,17 +63,19 @@ flann = cv2.FlannBasedMatcher(index_params, search_params)
 cap = cv2.VideoCapture(0)
 while(cap.isOpened()):
 	ret, frame = cap.read()
+	frame = cv2.flip(frame, 1)
 	kpFrame, desFrame = sift.detectAndCompute(frame,None)
 	if (matchAndFind(imgExchange, kpExchange, desExchange, frame, kpFrame, desFrame)):
 		print("Exchange zone DETECTED!")
 	elif (matchAndFind(imgTerraine, kpTerraine, desTerraine, frame, kpFrame, desFrame)):
 		print("Empty terraines zone DETECTED!")
 	elif (matchAndFind(imgTank, kpTank, desTank, frame, kpFrame, desFrame)):
-		print("Exchange zone DETECTED!")
+		print("Milk tank zone DETECTED!")
 	else:
 		print("No zone detected.")
 
 	if cv2.waitKey(1) == ord("z"):
 		break
-	
+cap.release()		
+cv2.destroyAllWindows()
 	
