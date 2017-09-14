@@ -1,5 +1,20 @@
 from math import sin,cos,atan2
 
+class input:
+
+	def __init__(self, xGoal, yGoal, v):
+		self.xGoal = xGoal
+		self.yGoal = yGoal
+		self.v = v
+
+class output:
+
+	def __init__(self, v, w):
+		self.v = v
+		self.w = w
+
+
+
 #Steers the robot towards a goal with a constant velocity using PID.
 class goToGoal:
 
@@ -13,6 +28,8 @@ class goToGoal:
 		self.errorAcum = 0
 		self.errorPrev = 0
 
+		self.inputs = input(0,0,0)
+		self.output = output(0,0)
         #inputs = struct('x_g', 0, 'y_g', 0, 'v', 0);
         #outputs = struct('v', 0, 'w', 0);
 
@@ -20,8 +37,8 @@ class goToGoal:
     # to the goal location (x_g, y_g) with a constant linear velocity of v.
 	def execute(self, robot, stateEstimate, inputs, dt):
 		# Retrieve the (relative) goal location.
-		xGoal = inputs.x_g; 
-		yGoal = inputs.y_g;
+		xGoal = inputs.xGoal; 
+		yGoal = inputs.yGoal;
 
 		# Get estimate of current pose.
 		x, y, theta = stateEstimate.unpack();
@@ -57,4 +74,7 @@ class goToGoal:
 		self.errorAcum = eIntegral
 		self.errorPrev = error
 
-		return v,w
+		self.output.v = v
+		self.output.w = w
+
+		return self.output
