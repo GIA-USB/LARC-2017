@@ -1,5 +1,5 @@
 from math import sin,cos,atan2,pi
-from goToGoal import*
+from goToGoal import *
 from numpy import sign
 
 class Supervisor():
@@ -8,7 +8,6 @@ class Supervisor():
 	     dAtObs = 0.25, dUnsafe = 0.10, d_fw = 0.001, 
 	     fwDirection = 'left', isBlending = True):
 		# Supervisor constructor.
-
 
 		self.robot = robot
 		# Initialize the controllers

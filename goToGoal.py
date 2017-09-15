@@ -13,8 +13,6 @@ class output:
 		self.v = v
 		self.w = w
 
-
-
 #Steers the robot towards a goal with a constant velocity using PID.
 class goToGoal:
 
