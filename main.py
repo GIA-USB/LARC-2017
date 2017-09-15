@@ -1,5 +1,6 @@
 from Robot import *
 from Supervisor import *
+from time import *
 
 M1IN1 = 19 # Motor Driver Pin M1IN1 
 M1IN2 = 26 # Motor Driver Pin M1IN2
@@ -15,3 +16,5 @@ milky.setMotors(M1IN1, M1IN2, M2IN1, M2IN2)
 milky.setEncoders(E1A, E1B, E2A, E2B)
 navigation = Supervisor(milky)
 
+while(true):
+	navigation.execute(0.02)
