@@ -1,10 +1,11 @@
-from math import sin,cos,atan2,pi
+from math import sin,cos,atan2,pi, sqrt
 from goToGoal import *
 from numpy import sign
+import sys
 
 class Supervisor():
 
-	def __init__(self, robot, thetaD = pi/4, v = 0.15, goal = [-1, 1], dStop = 0.05,
+	def __init__(self, robot, thetaD = pi/4, v = 0.15, goal = [0, 0], dStop = 0.05,
 	     dAtObs = 0.25, dUnsafe = 0.10, d_fw = 0.001, 
 	     fwDirection = 'left', isBlending = True):
 		# Supervisor constructor.
@@ -14,7 +15,7 @@ class Supervisor():
 		self.controllers = []
 		#self.controllers.append(Stop())
 		#self.controllers.append(GoToAngle())
-		self.controllers.append(goToGoal(0,0,0))
+		self.controllers.append(goToGoal(1,1.5,1))
 		#self.controllers.append(AvoidObstacles())
 		#self.controllers.append(AOandGTG())
 		#self.controllers.append(FollowWall())
@@ -81,10 +82,20 @@ class Supervisor():
 		#inputs.d_fw = self.d_fw
 
 		outputs = self.currentController.execute(self.robot, self.robot.stateEstimate, inputs, dt)
-
+		print("Ov =" + str(outputs.v) + " Ow = " + str(outputs.w))
+		#[velR, velL] = self.robot.dynamics.uniToDiff(outputs.v,outputs.w)
 		[velR, velL] = self.ensureW(outputs.v, outputs.w)
-		self.robot.setWheelSpeeds(velR, velL);
-
+		print("VelR = " + str(velR) + " VelL = " + str(velL))
+		vector = [-self.goal[0] + self.robot.stateEstimate.x, -self.goal[1] + self.robot.stateEstimate.y]
+		vector[0] = vector[0]*vector[0]
+		vector[1] = vector[1]*vector[1]
+		val = sqrt(vector[0]+vector[1])
+		if(val < 0.05):
+			self.robot.setMotorsSpeeds(0,0);
+			sys.exit()
+		else:
+			self.robot.setMotorsSpeeds(velR, velL);
+		
 		# [x, y, theta] = obj.state_estimate.unpack();
 		# fprintf('current_pose: (%0.3f,%0.3f,%0.3f)\n', x, y, theta);
 
@@ -102,31 +113,32 @@ class Supervisor():
 
 		# Get wheel encoder ticks from the robot.
 		# ESTO DEBE ADAPTARSE A NUESTROS ENCODERS.
-		leftTicks = self.robot.encoders[0].getTicks()
-		rightTicks = self.robot.encoders[1].getTicks()
-
+		leftTicks = self.robot.leftEncoder.getTicks()
+		rightTicks = -self.robot.rightEncoder.getTicks()
+		print("Right: " + str(rightTicks) + " Left: " + str(leftTicks))
 		# RecalL the previous wheel encoder ticks.
-		# ESTO DEBE ADAPTARSE.
 		prevRightTicks = self.robot.prevTicks.right
 		prevLeftTicks = self.robot.prevTicks.left
 
 		# Previous estimate.
-		# ESTO DEBE ADAPTARSE.
 		[x, y, theta] = self.robot.stateEstimate.unpack()
-
+		print("PrevRight: " + str(prevRightTicks) + " PrevLeft: " + str(prevLeftTicks))
 		# Compute odometry here
 		R = self.robot.wheelRadius
 		L = self.robot.wheelBaseLength
 		mPerTick = (2 * pi * R) / self.robot.ticksPerRev
-
+		print("Right resta: " + str(rightTicks - prevRightTicks))
+		print("Left resta: " + str(leftTicks - prevLeftTicks))
 		dRight = (rightTicks - prevRightTicks) * mPerTick
 		dLeft = (leftTicks - prevLeftTicks) * mPerTick
 		dCenter = (dRight + dLeft) / 2
 
 		xNew = x + dCenter * cos(theta)
 		yNew = y + dCenter * sin(theta)
-		thetaNew = theta + (dRight - dLeft) / L
-		                       
+		print("Theta antes: " + str(theta))
+		print("Lo que le voy a sumar o restar: " + str(((dRight - dLeft) / L)))
+		thetaNew = theta + ((dRight - dLeft) / L)
+		print("Thetanew: " + str(thetaNew))
 		# fprintf('Estimated pose (x,y,theta): (%0.3g,%0.3g,%0.3g)\n', x_new, y_new, theta_new);
 
 		# Save the wheel encoder ticks for the next estimate
@@ -148,15 +160,16 @@ class Supervisor():
 		velMin = self.robot.minVel
 
 		if (abs(v) > 0):
+			print("W: " + str(w))
 			# 1. Limit v,w to be possible in the range [vel_min, vel_max]
 			# (avoid stalling or exceeding motor limits)
 			vLim = max(min(abs(v), (R / 2) * (2 * velMax)), (R / 2) * (2 * velMin))
 			wLim = max(min(abs(w), (R / L) * (velMax - velMin)), 0) 
-
+			print("Vlim= " + str(vLim) + " wLim= " + str(wLim))
 			#2. Compute the desired curvature of the robot's motion
 
 			[velRDiff, velLDiff] = self.robot.dynamics.uniToDiff(vLim, wLim)
-
+			print("velLDiff: " + str(velLDiff) + " velRDiff: " + str(velRDiff))
 			# 3. Find the max and min velR/velL
 			velRLMax = max(velRDiff, velLDiff)
 			velRLMin = min(velRDiff, velLDiff)
@@ -167,7 +180,7 @@ class Supervisor():
 			    velL = velLDiff - (velRLMax - velMax)
 			elif (velRLMin < velMin):
 			    velR = velRDiff + (velMin - velRLMin)
-			    velL = velLdiff + (velMin - velRLMin)
+			    velL = velLDiff + (velMin - velRLMin)
 			else:
 			    velR = velRDiff
 			    velL = velLDiff
@@ -176,6 +189,7 @@ class Supervisor():
 			[vShift, wShift] = self.robot.dynamics.diffToUni(velR, velL)
 			v = sign(v) * vShift
 			w = sign(w) * wShift
+			print("VELL: " + str(velL) + "VelR: " + str(velR))
 		else:
 			# Robot is stationary, so we can either not rotate, or
 			# rotate with some minimum/maximum angular velocity

@@ -13,7 +13,7 @@ def findChessboardPosition(img, boardSize):
 	eImg = cv2.cvtColor(eImg, cv2.COLOR_BGR2GRAY)
 	cv2.equalizeHist(eImg, eImg)
 	
-	cv2.imshow("E", eImg)
+	#cv2.imshow("E", eImg)
 	
 	# Find corners of the chessboard (cow)
 	retval, corners = cv2.findChessboardCorners(eImg, boardSize, flags = cv2.CALIB_CB_ADAPTIVE_THRESH)
@@ -21,7 +21,7 @@ def findChessboardPosition(img, boardSize):
 	# Draw corners found
 	cv2.drawChessboardCorners(img, boardSize, corners, retval)
 	
-	cv2.imshow("Chess", img)
+	#cv2.imshow("Chess", img)
 	# Refines the corner locations: DOESNT WORKS
 	#term = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_MAX_ITER, 100, 0.001)
 	#cv2.cornerSubPix(img, corners, boardSize, (-1, -1) , term) #criteria.maxCount
