@@ -2,7 +2,8 @@ from Robot import *
 from Supervisor import *
 import time
 from time import sleep
-
+#rueda izquierda esta al reves
+#rueda derecha esta al reves
 M1IN1 = 19 # Motor Driver Pin M1IN1 
 M1IN2 = 26 # Motor Driver Pin M1IN2
 M2IN1 = 16 # Motor Driver Pin M2IN1

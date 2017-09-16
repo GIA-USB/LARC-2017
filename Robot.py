@@ -30,7 +30,7 @@ class Robot:
 		self.prevTicks = ticks(0,0)
 		self.rightWheelSpeed = 0
 		self.leftWheelSpeed = 0
-		self.stateEstimate = Pose(x = 1.95, y = 0, theta = 0)
+		self.stateEstimate = Pose(x = 0, y = 0, theta = 0)
 		self.dynamics = DifferentialDrive(self.wheelRadius, self.wheelBaseLength);
 		self.pi = pigpio.pi()
 		self.rightMotor = None
@@ -40,8 +40,8 @@ class Robot:
 		self.irArray = []
         
 	def setMotors(self, M1IN1, M1IN2, M2IN1, M2IN2):
-		self.rightMotor = Motor(self.pi, M1IN1, M1IN2)
-		self.leftMotor = Motor(self.pi, M2IN1, M2IN2)
+		self.rightMotor = Motor(self.pi, M2IN1, M2IN2)
+		self.leftMotor = Motor(self.pi, M1IN1, M1IN2)
 		
 	def setEncoders(self, E1A, E1B, E2A, E2B):
 		self.rightEncoder = Encoder(self.pi, E1A, E1B)
@@ -103,8 +103,8 @@ class Robot:
 		if(leftPWM == 175):
 			leftPWM = 0
 		'''
-		self.rightMotor.setMotorPWM(0,rightPWM)
-		self.leftMotor.setMotorPWM(leftPWM,0)
+		self.rightMotor.setMotorPWM(0, rightPWM)
+		self.leftMotor.setMotorPWM(0,leftPWM)
 
 	def limitSpeeds(self, velR, velL):
 		# Actuator hardware limits
