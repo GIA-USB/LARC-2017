@@ -1,4 +1,4 @@
-from math import sin,cos,atan2
+from math import sin,cos,atan2,sqrt
 
 class input:
 
@@ -14,7 +14,7 @@ class output:
 		self.w = w
 
 #Steers the robot towards a goal with a constant velocity using PID.
-class goToGoal:
+class GoToGoal:
 
 	def __init__(self, kp, ki, kd):
         # Gains.
@@ -53,23 +53,23 @@ class goToGoal:
 		u_y = yGoal - y;
         # Angle from robot to goal.
 		thetaGoal = atan2(u_y,u_x)
-		#print("u_x: " + str(u_x) + "u_y: " + str(u_y) + "Theta: " + str(thetaGoal))
+		print("u_x: " + str(u_x) + " u_y: " + str(u_y) + " Theta: " + str(thetaGoal))
 		# Calculate the heading error.
         # Error between the goal angle and robot's angle.
 		error = thetaGoal - theta
 		print("Error antes: " + str(error))
 		error = atan2(sin(error),cos(error))
 		print("Error despues de atan2: " + str(error))
-		if(error < 0.2):
-			error = 0
-  
+		
 		# Calculate PID for the steering angle.
 		# Error for the integral term. Approximate the integral using the accumulated error.
 		eIntegral = self.errorAcum + error * dt
-
+		print("Error acumulado: " + str(self.errorAcum))
+		print("Error integral: " + str(eIntegral))
 		# Error for the derivative term. Approximate the derivative using the previous error.
 		eDerivate = (error - self.errorPrev) / dt
-
+		print("Error previo: " + str(self.errorPrev))
+		print("Error derivado: " + str(eDerivate))
 		w = self.Kp * error + self.Ki * eIntegral + self.Kd * eDerivate;
 		#print("W: " + str(w))
 		#Save errors for next time step
@@ -80,3 +80,13 @@ class goToGoal:
 		self.output.w = w
 
 		return self.output
+		
+	def checkTransitions(self, robot, stateEstimate, inputs):
+		u_x = stateEstimate.x - inputs.xGoal
+		u_y = stateEstimate.y - inputs.yGoal 
+		u_x *= u_x
+		u_y *= u_y 
+		if(sqrt(u_x + u_y) < 0.05):
+			return 0
+		else:
+			return 2
