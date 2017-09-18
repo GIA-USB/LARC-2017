@@ -12,20 +12,31 @@ E1A   = 12 # Right Encoder A Output - Yellow Wire
 E1B   = 13 # Right Encoder B Output - White Wire
 E2A   = 5  # Left Encoder A Output - Yellow Wire
 E2B   = 6  # Left Encoder B Output - White Wire
+TRIG  = 24 
+ECHO1 = 10 
+ECHO2 = 9
+ECHO3 = 11
+ECHO4 = 25
+ECHO5 = 8
+ECHO6 = 7
 
 milky = Robot(0.06, 0.29, 48*74.83, 0, 180, 100, 100)
 milky.setMotors(M1IN1, M1IN2, M2IN1, M2IN2)
 milky.setEncoders(E1A, E1B, E2A, E2B)
-#milky.setIMU()
+milky.setIMU()
+milky.setUltrasonics(TRIG,ECHO1,ECHO2,ECHO3,ECHO4,ECHO5,ECHO6)
+#milky.imu.getData(2000)
 #print(milky.imu)
-#print(milky.imu.getFirstOrientation(200))
+clock = time.time()
+print(milky.imu.getFirstOrientation(250))
+print(time.time() - clock)
 navigation = Supervisor(milky)
 i = 0
 oldClock = time.time()
 newClock = 0
 delta = 0
 sleep(0.2)
-while(True):
+while(False):
 	newClock = time.time()
 	delta = newClock - oldClock
 	print(str(i))

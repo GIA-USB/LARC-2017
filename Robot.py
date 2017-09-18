@@ -3,6 +3,7 @@ from Pose import Pose
 from DCMotor import Motor
 from rotaryEncoder import Encoder
 from IMU import IMU
+from Ultrasonic import Ultrasonic
 from math import pi
 from numpy import sign
 import pigpio
@@ -38,7 +39,7 @@ class Robot:
 		self.leftEnconder = None
 		self.rightEncoder = None
 		self.imu = None
-		self.irArray = []
+		self.ultrasonics = []
         
 	def setMotors(self, M1IN1, M1IN2, M2IN1, M2IN2):
 		self.leftMotor = Motor(self.pi, M1IN1, M1IN2)
@@ -50,6 +51,14 @@ class Robot:
 		
 	def setIMU(self):
 		self.imu = IMU()
+		
+	def setUltrasonics(self,TRIGGER,ECHO1,ECHO2,ECHO3,ECHO4,ECHO5,ECHO6):
+		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO1))
+		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO2))
+		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO3))
+		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO4))
+		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO5))
+		self.ultrasonics.append(Ultrasonic(self.pi,TRIGGER,ECHO6))
 		
 	def getUSDistances(self):
 		ir_array_values = self.ir_array.get_range()
