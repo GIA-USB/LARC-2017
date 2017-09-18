@@ -38,7 +38,7 @@ def findChessboardPosition(img, boardSize):
 		cv2.circle(img, (int(P[0]), int(P[1])), 1, (0, 0, 0))
 		P[0] = P[0]/N
 		P[1] = P[1]/M
-		cv2.imshow("Center", img)
+		#cv2.imshow("Center", img)
 		print(retval)
 		print(str(corners))
 		print(str(P))
@@ -48,7 +48,7 @@ def findChessboardPosition(img, boardSize):
 		
 
 # Cows looks like this in pictures and GIA: 3 rows x 6 columns
-boardSize = (3, 6)
+boardSize = (3, 4)
 
 camera = PiCamera()
 camera.resolution = (640, 480)
