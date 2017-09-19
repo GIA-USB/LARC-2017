@@ -1,4 +1,4 @@
-from math import sin,cos,atan2,pi, sqrt
+from math import sin,cos,atan2,pi,sqrt,radians
 from Stop import *
 from GoToAngle import *
 from GoToGoal import *
@@ -53,10 +53,13 @@ class Supervisor():
 		print("Ov =" + str(outputs.v) + " Ow = " + str(outputs.w))
 		#[velR, velL] = self.robot.dynamics.uniToDiff(outputs.v,outputs.w)
 		[velR, velL] = self.ensureW(outputs.v, outputs.w)
+		'''
 		if (velR < 0 or velL < 0):
 			print("GRITAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 		print("VelR = " + str(velR) + " VelL = " + str(velL))
+		'''
 		current = self.currentController.checkTransitions(self.robot, self.robot.stateEstimate, inputs)
+		print("Current Controller: " + str(current))
 		self.currentController = self.controllers[current]
 		self.robot.setMotorsSpeeds(velR,velL)
 		
@@ -115,10 +118,17 @@ class Supervisor():
 		elif(abs(error) <= pi):
 			thetaNew = theta + (-1*abs(((dRight - dLeft) / L)))
 		'''
+		'''
 		print("Theta antes: " + str(theta))
 		print("Lo que le voy a sumar o restar: " + str(((dRight - dLeft) / L)))
 		thetaNew = theta + ((dRight - dLeft) / L)
 		print("Thetanew: " + str(thetaNew))
+		'''
+		auxthetaNew = (self.robot.getYaw() + self.robot.stateEstimate.yawOffset) % 360
+		auxthetaNew = radians(auxthetaNew)
+		#auxthetaNew = atan2(sin(auxthetaNew),cos(auxthetaNew))
+		print("Theta IMU: " + str(auxthetaNew))
+		
 		# fprintf('Estimated pose (x,y,theta): (%0.3g,%0.3g,%0.3g)\n', x_new, y_new, theta_new);
 
 		# Save the wheel encoder ticks for the next estimate
@@ -127,7 +137,8 @@ class Supervisor():
 		self.robot.prevTicks.left = leftTicks
 
 		# Update your estimate of (x,y,theta)
-		self.robot.stateEstimate.setPose([xNew, yNew, atan2(sin(thetaNew), cos(thetaNew))])
+		self.robot.stateEstimate.setPose([xNew, yNew, atan2(sin(auxthetaNew), cos(auxthetaNew))])
+		# self.robot.stateEstimate.setPose([xNew, yNew, thetaNew])
 
 	def ensureW(self, v, w):
 

@@ -4,7 +4,7 @@ from DCMotor import Motor
 from rotaryEncoder import Encoder
 from IMU import IMU
 from Ultrasonic import Ultrasonic
-from math import pi
+from math import pi, radians
 from numpy import sign
 import pigpio
 
@@ -31,7 +31,7 @@ class Robot:
 		self.prevTicks = ticks(0,0)
 		self.rightWheelSpeed = 0
 		self.leftWheelSpeed = 0
-		self.stateEstimate = Pose(x = 0, y = 0, theta = 0)
+		self.stateEstimate = Pose(x = 0, y = 0, theta = 0, yawO = 0)
 		self.dynamics = DifferentialDrive(self.wheelRadius, self.wheelBaseLength);
 		self.pi = pigpio.pi()
 		self.rightMotor = None
@@ -51,6 +51,29 @@ class Robot:
 		
 	def setIMU(self):
 		self.imu = IMU()
+		
+	def getYaw(self):
+		value = ""
+		req = open('requestPipe', "w")
+		req.write('ok')
+		req.close()
+		while (len(value) == 0):
+			resp = open('responsePipe','r') 
+			value = resp.read()
+			resp.close()
+		value = value.split()
+		value = float(value[0]) * sign(float(value[1]))
+		print("Angulo Original: " + str(value))
+		resp.close()
+		resp = open('responsePipe','w')
+		resp.write("")
+		resp.close()
+		if (value > 0):
+			value = 180 - value
+		else:
+			value = 360 + value
+		print("Angulo transformado: " + str(value))
+		return value
 		
 	def setUltrasonics(self,TRIGGER,ECHO1,ECHO2,ECHO3,ECHO4,ECHO5,ECHO6):
 		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO1))

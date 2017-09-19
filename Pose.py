@@ -2,16 +2,17 @@ from math import sin,cos,atan2,pi
 
 class Pose:
     
-    def __init__(self, x = 0, y = 0, theta = 0):
+    def __init__(self, x = 0, y = 0, theta = 0, yawO = 0):
         self.x = x
         self.y = y
         self.theta = theta
+        self.yawOffset = yawO
     
     def setPose(self, pose):
         self.x = pose[0]
         self.y = pose[1]
         self.theta = pose[2]
-    
+
     def unpack(self):
         return [self.x, self.y, self.theta]
     
