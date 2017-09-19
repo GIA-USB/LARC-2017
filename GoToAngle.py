@@ -26,20 +26,22 @@ class GoToAngle():
 		u_x = inputs.xGoal - x;     
 		u_y = inputs.yGoal - y;
 		thetaGoal = atan2(u_y,u_x)
-		print(thetaGoal)
+		print("ThetaGoal: " + str(thetaGoal))
 		error = thetaGoal - theta
 		error = atan2(sin(error),cos(error))
-		print(error)
-		if (abs(error) < 0.3):
+		print("Error thetas: " + str(error))
+		"""
+		if (abs(error) < 1):
 			if (error > 0):
 				[v,w] = robot.dynamics.diffToUni(0.3,-0.3)
 			else:
 				[v,w] = robot.dynamics.diffToUni(-0.3,0.3)
 		else:
-			if (error > 0):
-				[v,w] = robot.dynamics.diffToUni(0.8,-0.8)
-			else:
-				[v,w] = robot.dynamics.diffToUni(-0.8,0.8)
+		"""
+		if (error > 0):
+			[v,w] = robot.dynamics.diffToUni(0.8,-0.8)
+		else:
+			[v,w] = robot.dynamics.diffToUni(-0.8,0.8)
 		self.checkError = error
 		self.output.v = v
 		self.output.w = w
@@ -47,7 +49,7 @@ class GoToAngle():
 		return self.output
 
 	def checkTransitions(self, robot, stateEstimate, inputs):
-		if (abs(self.checkError) < 0.05):
+		if (abs(self.checkError) < 0.07):
 			return 2
 		else:
 			return 1

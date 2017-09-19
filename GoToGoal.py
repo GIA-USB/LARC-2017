@@ -57,19 +57,19 @@ class GoToGoal:
 		# Calculate the heading error.
         # Error between the goal angle and robot's angle.
 		error = thetaGoal - theta
-		print("Error antes: " + str(error))
+		#print("Error antes: " + str(error))
 		error = atan2(sin(error),cos(error))
-		print("Error despues de atan2: " + str(error))
+		#print("Error despues de atan2: " + str(error))
 		
 		# Calculate PID for the steering angle.
 		# Error for the integral term. Approximate the integral using the accumulated error.
 		eIntegral = self.errorAcum + error * dt
-		print("Error acumulado: " + str(self.errorAcum))
-		print("Error integral: " + str(eIntegral))
+		#print("Error acumulado: " + str(self.errorAcum))
+		#print("Error integral: " + str(eIntegral))
 		# Error for the derivative term. Approximate the derivative using the previous error.
 		eDerivate = (error - self.errorPrev) / dt
-		print("Error previo: " + str(self.errorPrev))
-		print("Error derivado: " + str(eDerivate))
+		#print("Error previo: " + str(self.errorPrev))
+		#print("Error derivado: " + str(eDerivate))
 		w = self.Kp * error + self.Ki * eIntegral + self.Kd * eDerivate;
 		#print("W: " + str(w))
 		#Save errors for next time step

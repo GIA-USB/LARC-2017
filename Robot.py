@@ -51,7 +51,7 @@ class Robot:
 		
 	def setIMU(self):
 		self.imu = IMU()
-		
+	'''	
 	def getYaw(self):
 		value = ""
 		req = open('requestPipe', "w")
@@ -72,9 +72,10 @@ class Robot:
 			value = 180 - value
 		else:
 			value = 360 + value
+			#value = 360 + value
 		print("Angulo transformado: " + str(value))
 		return value
-		
+	'''	
 	def setUltrasonics(self,TRIGGER,ECHO1,ECHO2,ECHO3,ECHO4,ECHO5,ECHO6):
 		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO1))
 		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO2))
