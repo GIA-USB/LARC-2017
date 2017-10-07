@@ -19,8 +19,11 @@ class Robot:
         self.ticksPerRev = ticksPerRev #Entero
         self.minRPM = minRPM
         self.maxRPM = maxRPM
-        self.minVel = minRPM * 2 * pi / 60 # En rad/s
-        self.maxVel = maxRPM * 2 * pi / 60 # En rad/s
+        #self.minVel = minRPM * 2 * pi / 60 # En rad/s
+        #self.maxVel = maxRPM * 2 * pi / 60 # En rad/s
+        self.minVel = 0.0394496029208 # En rad/s
+        self.maxVel = 0.0433583709166 # En rad/s
+        self.beta = [4.88595999478e-05, -0.0519088009075]        
         self.encoders = []
         self.irArray = []
         self.dynamics = DifferentialDrive(self.wheelRadius, self.wheelBaseLength);
