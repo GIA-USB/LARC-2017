@@ -91,5 +91,4 @@ for f in camera.capture_continuous(rawCapture, format="bgr", use_video_port=True
 	if cv2.waitKey(1) == ord("z"):
 		break
 		
-cap.release()		
 cv2.destroyAllWindows()
