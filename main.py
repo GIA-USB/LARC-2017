@@ -16,5 +16,5 @@ milky.setMotors(M1IN1, M1IN2, M2IN1, M2IN2)
 milky.setEncoders(E1A, E1B, E2A, E2B)
 navigation = Supervisor(milky)
 
-while(true):
-	navigation.execute(0.02)
+while(True):
+	navigation.execute(clock())
