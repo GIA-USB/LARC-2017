@@ -15,34 +15,6 @@ class decoder:
       called when the rotary encoder is turned.  It takes
       one parameter which is +1 for clockwise and -1 for
       counterclockwise.
-
-      EXAMPLE
-
-      import time
-      import pigpio
-
-      import rotary_encoder
-
-      pos = 0
-
-      def callback(way):
-
-         global pos
-
-         pos += way
-
-         print("pos={}".format(pos))
-
-      pi = pigpio.pi()
-
-      decoder = rotary_encoder.decoder(pi, 7, 8, callback)
-
-      time.sleep(300)
-
-      decoder.cancel()
-
-      pi.stop()
-
       """
 
       self.pi = pi
@@ -94,10 +66,6 @@ class decoder:
       delta = (self.newState - self.lastState) % 4
       if delta == 1:
          self.count += 1
-      '''
-      elif delta == 2:
-         self.count -= 1
-      '''
       elif delta == 3:
          self.count -= 1
       #print(delta)  
@@ -124,13 +92,15 @@ class decoder:
       self.cbB.cancel()
 
 if __name__ == "__main__":
-
    import time
    import pigpio
-
    import rotary_encoder
 
    pos = 0
+   motor_r = (19,26)
+   motor_l = (16,20)
+   encoder_r = (12,13)
+   encoder_l = (5,6)
 
    def callback(way):
 
@@ -141,23 +111,30 @@ if __name__ == "__main__":
       print("pos={}".format(pos))
 
    pi = pigpio.pi()
-   pi.set_mode(5, pigpio.OUTPUT)
-   pi.set_mode(6, pigpio.OUTPUT)
-   pi.set_PWM_dutycycle(5, 255)
-   pi.set_PWM_dutycycle(6, 0)
-   
-   decoder = rotary_encoder.decoder(pi, 13, 19, callback)
-   
-   time.sleep(60)
+   pi.set_mode(motor_r[0], pigpio.OUTPUT)
+   pi.set_mode(motor_r[1], pigpio.OUTPUT)
+   pi.set_mode(motor_l[0], pigpio.OUTPUT)
+   pi.set_mode(motor_l[1], pigpio.OUTPUT)
+   pi.set_PWM_dutycycle(motor_r[0], 0)
+   pi.set_PWM_dutycycle(motor_r[1], 115)
+   pi.set_PWM_dutycycle(motor_l[0], 115)
+   pi.set_PWM_dutycycle(motor_l[1], 0)
+   decoder1 = rotary_encoder.decoder(pi, encoder_r[0] , encoder_r[1], callback)
+   decoder2 = rotary_encoder.decoder(pi, encoder_l[0] , encoder_l[1], callback)
+   time.sleep(10)
    '''
    pi.set_PWM_dutycycle(5,0)
    pi.set_PWM_dutycycle(6,255)
    
    time.sleep(1)
    '''
-   pi.set_PWM_dutycycle(5,0)
-   pi.set_PWM_dutycycle(6,0)
-   print(decoder.count)
-   decoder.cancel()
+   pi.set_PWM_dutycycle(motor_r[0],0)
+   pi.set_PWM_dutycycle(motor_r[1],0)
+   pi.set_PWM_dutycycle(motor_l[0],0)
+   pi.set_PWM_dutycycle(motor_l[1],0)
+   print("Der: " , decoder1.count)
+   print("Izq: " , decoder2.count)
+   aux = (74.83 * 48)
+   decoder1.cancel()
+   decoder2.cancel()
    pi.stop()
-
