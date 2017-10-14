@@ -38,27 +38,31 @@ class goToGoal:
 		xGoal = inputs.xGoal; 
 		yGoal = inputs.yGoal;
 
+		#print("xGoal: " + str(xGoal) + "yGoal: " + str(yGoal))
 		# Get estimate of current pose.
 		x, y, theta = stateEstimate.unpack();
-            
+		#print("x: " + str(x) + "y: " + str(y) + "Theta: " + str(theta))
 		# Compute the v,w that will get you to the goal.
 		v = inputs.v
 
 		# Calculate the heading (angle) to the goal.
 		# Distance between goal and robot in x-direction.
 		u_x = xGoal - x;     
-                
+
 		# Distance between goal and robot in y-direction.
 		u_y = yGoal - y;
-                
         # Angle from robot to goal.
 		thetaGoal = atan2(u_y,u_x)
-
+		#print("u_x: " + str(u_x) + "u_y: " + str(u_y) + "Theta: " + str(thetaGoal))
 		# Calculate the heading error.
         # Error between the goal angle and robot's angle.
 		error = thetaGoal - theta
+		print("Error antes: " + str(error))
 		error = atan2(sin(error),cos(error))
-            
+		print("Error despues de atan2: " + str(error))
+		if(error < 0.2):
+			error = 0
+  
 		# Calculate PID for the steering angle.
 		# Error for the integral term. Approximate the integral using the accumulated error.
 		eIntegral = self.errorAcum + error * dt
@@ -67,7 +71,7 @@ class goToGoal:
 		eDerivate = (error - self.errorPrev) / dt
 
 		w = self.Kp * error + self.Ki * eIntegral + self.Kd * eDerivate;
-
+		#print("W: " + str(w))
 		#Save errors for next time step
 		self.errorAcum = eIntegral
 		self.errorPrev = error
