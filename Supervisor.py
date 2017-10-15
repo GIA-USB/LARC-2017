@@ -1,11 +1,13 @@
 from math import sin,cos,atan2,pi, sqrt
-from goToGoal import *
+from Stop import *
+from GoToAngle import *
+from GoToGoal import *
 from numpy import sign
 import sys
 
 class Supervisor():
 
-	def __init__(self, robot, thetaD = pi/4, v = 0.15, goal = [2, 0], dStop = 0.05,
+	def __init__(self, robot, thetaD = pi/4, v = 0.15, goal = [-1, 0], dStop = 0.05,
 	     dAtObs = 0.25, dUnsafe = 0.10, d_fw = 0.001, 
 	     fwDirection = 'left', isBlending = True):
 		# Supervisor constructor.
@@ -13,41 +15,16 @@ class Supervisor():
 		self.robot = robot
 		# Initialize the controllers
 		self.controllers = []
-		#self.controllers.append(Stop())
-		#self.controllers.append(GoToAngle())
-		self.controllers.append(goToGoal(1,1.5,1))
+		self.controllers.append(Stop())
+		self.controllers.append(GoToAngle())
+		self.controllers.append(GoToGoal(0.3,0.5,0.3))
+		#self.controllers.append(goToGoal(1,1.5,1))
 		#self.controllers.append(AvoidObstacles())
 		#self.controllers.append(AOandGTG())
 		#self.controllers.append(FollowWall())
 
 		# set the initial controller
-		self.currentController = self.controllers[0]
-
-		'''
-		obj.current_state = 6;
-
-		% generate the set of states
-		for i = 1:length(obj.controllers)
-		obj.states{i} = struct('state', obj.controllers{i}.type, ...
-		                       'controller', obj.controllers{i});
-		end
-
-		% define the set of eventsd
-		obj.eventsd{1} = struct('event', 'at_obstacle', ...
-		                   'callback', @at_obstacle);
-
-		obj.eventsd{2} = struct('event', 'at_goal', ...
-		                   'callback', @at_goal);
-
-		obj.eventsd{3} = struct('event', 'obstacle_cleared', ...
-		                    'callback', @obstacle_cleared);
-		                
-		obj.eventsd{4} = struct('event', 'unsafe', ...
-		                    'callback', @unsafe);
-		               
-		obj.prev_ticks = struct('left', 0, 'right', 0);
-		'''
-
+		self.currentController = self.controllers[1]
 		self.thetaD = thetaD
 		self.v = v
 		self.goal = goal
@@ -57,14 +34,6 @@ class Supervisor():
 		self.d_fw = d_fw
 		self.fwDirection = fwDirection
 		self.isBlending = isBlending
-
-		'''
-		obj.p = []; % simiam.util.Plotter();
-		obj.current_controller.p = obj.p;
-
-		obj.switch_count = 0;
-
-		'''
 
 	def execute(self, dt):
 		# EXECUTE Selects and executes the current controller.
@@ -80,25 +49,17 @@ class Supervisor():
 		inputs.yGoal = self.goal[1]
 		#inputs.direction = self.fwDirection
 		#inputs.d_fw = self.d_fw
-
 		outputs = self.currentController.execute(self.robot, self.robot.stateEstimate, inputs, dt)
 		print("Ov =" + str(outputs.v) + " Ow = " + str(outputs.w))
 		#[velR, velL] = self.robot.dynamics.uniToDiff(outputs.v,outputs.w)
 		[velR, velL] = self.ensureW(outputs.v, outputs.w)
+		if (velR < 0 or velL < 0):
+			print("GRITAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA")
 		print("VelR = " + str(velR) + " VelL = " + str(velL))
-		vector = [-self.goal[0] + self.robot.stateEstimate.x, -self.goal[1] + self.robot.stateEstimate.y]
-		vector[0] = vector[0]*vector[0]
-		vector[1] = vector[1]*vector[1]
-		val = sqrt(vector[0]+vector[1])
-		if(val < 0.05):
-			self.robot.setMotorsSpeeds(0,0);
-			sys.exit()
-		else:
-			self.robot.setMotorsSpeeds(velR, velL);
+		current = self.currentController.checkTransitions(self.robot, self.robot.stateEstimate, inputs)
+		self.currentController = self.controllers[current]
+		self.robot.setMotorsSpeeds(velR,velL)
 		
-		# [x, y, theta] = obj.state_estimate.unpack();
-		# fprintf('current_pose: (%0.3f,%0.3f,%0.3f)\n', x, y, theta);
-
 	def updateOdometry(self):
 		'''
 		UPDATE_ODOMETRY Approximates the location of the robot.
@@ -133,8 +94,27 @@ class Supervisor():
 		dLeft = (leftTicks - prevLeftTicks) * mPerTick
 		dCenter = (dRight + dLeft) / 2
 
+		xGoal = self.goal[0]
+		yGoal = self.goal[1]
+		u_x = xGoal - x;     
+
+		# Distance between goal and robot in y-direction.
+		u_y = yGoal - y;
+        # Angle from robot to goal.
+		thetaGoal = atan2(u_y,u_x)
+		#print("u_x: " + str(u_x) + " u_y: " + str(u_y) + " Theta: " + str(thetaGoal))
+		# Calculate the heading error.
+        # Error between the goal angle and robot's angle.
+		error = thetaGoal - theta
+
 		xNew = x + dCenter * cos(theta)
 		yNew = y + dCenter * sin(theta)
+		'''
+		if(abs(error) > pi):
+			thetaNew = theta + ((dRight - dLeft) / L)
+		elif(abs(error) <= pi):
+			thetaNew = theta + (-1*abs(((dRight - dLeft) / L)))
+		'''
 		print("Theta antes: " + str(theta))
 		print("Lo que le voy a sumar o restar: " + str(((dRight - dLeft) / L)))
 		thetaNew = theta + ((dRight - dLeft) / L)
@@ -165,7 +145,7 @@ class Supervisor():
 			# (avoid stalling or exceeding motor limits)
 			vLim = max(min(abs(v), (R / 2) * (2 * velMax)), (R / 2) * (2 * velMin))
 			wLim = max(min(abs(w), (R / L) * (velMax - velMin)), 0) 
-			print("Vlim= " + str(vLim) + " wLim= " + str(wLim))
+			print("vlim= " + str(vLim) + " wLim= " + str(wLim))
 			#2. Compute the desired curvature of the robot's motion
 
 			[velRDiff, velLDiff] = self.robot.dynamics.uniToDiff(vLim, wLim)
@@ -189,13 +169,13 @@ class Supervisor():
 			[vShift, wShift] = self.robot.dynamics.diffToUni(velR, velL)
 			v = sign(v) * vShift
 			w = sign(w) * wShift
-			print("VELL: " + str(velL) + "VelR: " + str(velR))
+			print("v: " + str(v) + "w: " + str(w))
 		else:
 			# Robot is stationary, so we can either not rotate, or
 			# rotate with some minimum/maximum angular velocity
 			wMin = R / L * (2 * velMin)
 			wMax = R / L * (2 * velMax)
-			if (abs(w) > w_min):
+			if (abs(w) > wMin):
 			    w = sign(w) * max(min(abs(w), wMax), wMin)
 			else:
 			    w = 0
