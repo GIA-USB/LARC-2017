@@ -18,10 +18,11 @@ class Ultrasonic():
 	
 	def __init__(self, pi, trig, echo):
 		self.pi = pi
-		self.trigger = trig
+		self.trig = trig
 		self.distance = 999.9
 		self.oneTick = None
 		self.SOS = 340.29
+		self.echo = echo
 		
 		if trig is not None:
 			pi.set_mode(trig, pigpio.OUTPUT)
@@ -40,12 +41,11 @@ class Ultrasonic():
 	def trigger(self):
 		self.distance = 999.9
 		self.oneTick = None
-		
 		if self.trig is not None:
 			self.pi.gpio_trigger(self.trig, 15) # 15 micros trigger pulse
 
 	def read(self):
-		return self._distance
+		return self.distance
 
 	def cancel(self):
 		self._cb.cancel()
