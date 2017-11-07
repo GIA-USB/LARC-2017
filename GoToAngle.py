@@ -49,7 +49,15 @@ class GoToAngle():
 		return self.output
 
 	def checkTransitions(self, robot, stateEstimate, inputs):
+		usDistances = np.array([0,0,0])
+		for i in range (0,10):
+			usDistances = usDistances + np.array(robot.getUSDistances())
+		usDistances /= 10
+		minDistance = min(usDistances)
+
 		if (abs(self.checkError) < 0.07):
 			return 2
+		elif (minDistance < 0.05):
+			return 3
 		else:
 			return 1

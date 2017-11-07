@@ -85,8 +85,16 @@ class GoToGoal:
 		u_x = stateEstimate.x - inputs.xGoal
 		u_y = stateEstimate.y - inputs.yGoal 
 		u_x *= u_x
-		u_y *= u_y 
-		if(sqrt(u_x + u_y) < 0.05):
+		u_y *= u_y
+		usDistances = np.array([0,0,0])
+		for i in range (0,10):
+			usDistances = usDistances + np.array(robot.getUSDistances())
+		usDistances /= 10
+		minDistance = min(usDistances)
+
+		if (sqrt(u_x + u_y) < 0.05):
 			return 0
+		elif (minDistance < 0.05):
+			return 3
 		else:
 			return 2

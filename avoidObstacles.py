@@ -14,7 +14,7 @@ class avoidObstacles:
 
 		calibrated = False
 		sensorPlacement = np.zeros([3,5])
-
+		minDistance = -1
 		#inputs = struct('x_g', 0, 'y_g', 0, 'v', 0);
         #outputs = struct('v', 0, 'w', 0);
 
@@ -29,7 +29,11 @@ class avoidObstacles:
 		x, y, theta = stateEstimate.unpack()
             
 		# Poll the current IR sensor values.
-		usDistances = robot.getUSDistances()
+		usDistances = np.array([0,0,0])
+		for i in range (0,10):
+			usDistances = usDistances + np.array(robot.getUSDistances())
+		usDistances /= 10
+		self.minDistance = min(usDistances)
 
 		# Interpret the IR sensor measurements geometrically.
 		usDistancesWF = self.applySensorGeometry(usDistances, robot.usLocation, stateEstimate)
@@ -89,3 +93,9 @@ class avoidObstacles:
 	def reset():
 		self.errorAcum = 0;
 		self.errorPrev = 0;
+
+	def checkTransitions(self, robot, stateEstimate, inputs):
+		if (self.minDistance > 0.1):
+			return 1
+		else:
+			return 3

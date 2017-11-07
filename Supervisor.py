@@ -18,8 +18,7 @@ class Supervisor():
 		self.controllers.append(Stop())
 		self.controllers.append(GoToAngle())
 		self.controllers.append(GoToGoal(0.5,0.7,0.5))
-		#self.controllers.append(goToGoal(1,1.5,1))
-		#self.controllers.append(AvoidObstacles())
+		self.controllers.append(AvoidObstacles(0.5,0.7,0.5))
 		#self.controllers.append(AOandGTG())
 		#self.controllers.append(FollowWall())
 
