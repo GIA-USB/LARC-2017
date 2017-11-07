@@ -20,21 +20,23 @@ class avoidObstacles:
 
 	def execute(self, robot, stateEstimate, inputs, dt):
 		# Compute the placement of the sensors.
+		'''
 		if (not(self.calibrated)):
 			self.setSensorGeometry(robot)
-            
+        '''
+
 		# Unpack state estimate.
 		x, y, theta = stateEstimate.unpack()
             
 		# Poll the current IR sensor values.
-		irDistances = robot.getIrDistances()
+		usDistances = robot.getUSDistances()
 
 		# Interpret the IR sensor measurements geometrically.
-		irDistancesWF = self.applySensorGeometry(irDistances, stateEstimate)
+		usDistancesWF = self.applySensorGeometry(usDistances, robot.usLocation, stateEstimate)
 
 		# Compute the heading vector for obstacle avoidance.
-		sensorGains = np.array([1, 1, 0.5, 1, 1])
-		u_i = np.dot((irDistancesWF - np.tile(np.array([[x],[y]]),1,5)), np.diag(sensorGains))
+		sensorGains = np.array([1, 0.5, 1])
+		u_i = np.dot((usDistancesWF - np.tile(np.array([[x],[y]]),1,3)), np.diag(sensorGains))
 		u_ao = np.sum(u_i,1);
             
 		# Compute the heading and error for the PID controller.
@@ -54,25 +56,25 @@ class avoidObstacles:
 
 		return v,w
 
-	def applySensorGeometry(self, irDistances, stateEstimate):
-		nSensors = len(irDistances)
+	def applySensorGeometry(self, usDistances, usLocation, stateEstimate):
+		nSensors = len(usDistances)
 
     	# Apply the transformation to robot frame.
-		irDistancesRF = np.zeros([3,5]);
+		usDistancesRF = np.zeros([3,nSensors]);
 		for i in range(nSensors):
-			x_s = self.sensorPlacement[1,i]
-			y_s = self.sensorPlacement[2,i]
-			theta_s = self.sensorPlacement[3,i]
+			x_s = usLocation[i][0]
+			y_s = usLocation[i][1]
+			theta_s = usLocation[i][2]
 			R = self.getTransformationMatrix(x_s, y_s, theta_s)
-			irDistancesRF[:,i] = np.dot(R, np.array([ir_distances[i], 0, 1]))
+			usDistancesRF[:,i] = np.dot(R, np.array([usDistances[i], 0, 1]))
            
 		# Apply the transformation to world frame.
 		[x,y,theta] = stateEstimate.unpack()
-		R = self.get_transformation_matrix(x,y,theta)
-		irDistancesWF = np.dot(R, irDistancesRF)
-		irDistancesWF = irDistancesWF[0:2,:]
+		R = self.getTransformationMatrix(x,y,theta)
+		usDistancesWF = np.dot(R, usDistancesRF)
+		usDistancesWF = usDistancesWF[0:2,:]
 
-		return irDistancesWF
+		return usDistancesWF
 
 	def setSensorGeometry(self, robot):
 		for i in range(5):

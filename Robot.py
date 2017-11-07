@@ -41,7 +41,8 @@ class Robot:
 		self.rightEncoder = None
 		self.imu = None
 		self.ultrasonics = []
-        
+		self.usLocation = [[0.15,0.21,90],[0.29,0,0],[0.15,-0.21,-90]]
+		
 	def setMotors(self, M1IN1, M1IN2, M2IN1, M2IN2):
 		self.leftMotor = Motor(self.pi, M1IN1, M1IN2)
 		self.rightMotor = Motor(self.pi, M2IN1, M2IN2)
