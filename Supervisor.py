@@ -7,7 +7,7 @@ import sys
 
 class Supervisor():
 
-	def __init__(self, robot, thetaD = pi/4, v = 0.15, goals = [[0.5,0],[1,0],[1.5,0]], dStop = 0.05,
+	def __init__(self, robot, thetaD = pi/4, v = 0.15, goals = [[0.5,0]], dStop = 0.05,
 	     dAtObs = 0.25, dUnsafe = 0.10, d_fw = 0.001, 
 	     fwDirection = 'left', isBlending = True):
 		# Supervisor constructor.

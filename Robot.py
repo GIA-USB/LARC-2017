@@ -76,18 +76,15 @@ class Robot:
 		print("Angulo transformado: " + str(value))
 		return value
 	'''	
-	def setUltrasonics(self,TRIGGER,ECHO1,ECHO2,ECHO3,ECHO4,ECHO5,ECHO6):
-		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO1))
-		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO2))
+	def setUltrasonics(self,TRIGGER,ECHO1,ECHO2,ECHO3):
 		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO3))
-		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO4))
-		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO5))
-		self.ultrasonics.append(Ultrasonic(self.pi,TRIGGER,ECHO6))
+		self.ultrasonics.append(Ultrasonic(self.pi,None,ECHO2))
+		self.ultrasonics.append(Ultrasonic(self.pi,TRIGGER,ECHO1))
 		
 	def getUSDistances(self):
-		ir_array_values = self.ir_array.get_range()
-		return ir_distances
+		for sensor in 
 	
+		
 	'''
     def updateState(self, pose, dt):
         R = self.wheelRadius

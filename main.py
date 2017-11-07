@@ -16,21 +16,16 @@ E2B   = 6  # Left Encoder B Output - White Wire
 GarI  = 8  # Motor garra derecha - Green Wire
 GarD  = 7  # Motor garra izquierda - Green Wire
 GRot  = 25 # Motor que rota las garras - Green wire
+TRIG  = 24 # Trigger pin for all ultrasonics - White Wire
+ECHO1 = 11 # Echo pin for Right US - Purple Wire
+ECHO2 = 9 # Echo pin for Center US - Purple Wire
+ECHO3 = 10 # Echo pin for Left US - Purple Wire
 
-'''
-TRIG  = 24 
-ECHO1 = 10 
-ECHO2 = 9
-ECHO3 = 11
-ECHO4 = 25
-ECHO5 = 8
-ECHO6 = 7
-'''
 milky = Robot(0.06, 0.29, 48*74.83, 0, 180, 100, 100)
 milky.setMotors(M1IN1, M1IN2, M2IN1, M2IN2)
 milky.setEncoders(E1A, E1B, E2A, E2B)
 milky.setIMU()
-#milky.setUltrasonics(TRIG,ECHO1,ECHO2,ECHO3,ECHO4,ECHO5,ECHO6)
+milky.setUltrasonics(TRIG,ECHO1,ECHO2,ECHO3)
 
 clock = time()
 #milky.stateEstimate.yawOffset = 360 - milky.getYaw()
