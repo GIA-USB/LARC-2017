@@ -82,8 +82,14 @@ class Robot:
 		self.ultrasonics.append(Ultrasonic(self.pi,TRIGGER,ECHO1))
 		
 	def getUSDistances(self):
-		for sensor in 
-	
+		#ir_array_values = self.ir_array.get_range()
+		for ultrasonic in self.ultrasonics:
+			ultrasonic.trigger()
+			time.sleep(0.03)
+		ir_distances = []
+		for ultrasonic in self.ultrasonics:
+			ir_distances.append(ultrasonic.read())
+		return ir_distances
 		
 	'''
     def updateState(self, pose, dt):
