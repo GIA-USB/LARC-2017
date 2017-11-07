@@ -6,6 +6,7 @@ from IMU import IMU
 from Ultrasonic import Ultrasonic
 from math import pi, radians
 from numpy import sign
+from time import sleep
 import pigpio
 
 class ticks:
@@ -82,14 +83,13 @@ class Robot:
 		self.ultrasonics.append(Ultrasonic(self.pi,TRIGGER,ECHO1))
 		
 	def getUSDistances(self):
-		#ir_array_values = self.ir_array.get_range()
 		for ultrasonic in self.ultrasonics:
 			ultrasonic.trigger()
-			time.sleep(0.03)
-		ir_distances = []
+			sleep(0.03)
+		irDistances = []
 		for ultrasonic in self.ultrasonics:
-			ir_distances.append(ultrasonic.read())
-		return ir_distances
+			irDistances.append(ultrasonic.read())
+		return irDistances
 		
 	'''
     def updateState(self, pose, dt):

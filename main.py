@@ -16,10 +16,10 @@ E2B   = 6  # Left Encoder B Output - White Wire
 GarI  = 8  # Motor garra derecha - Green Wire
 GarD  = 7  # Motor garra izquierda - Green Wire
 GRot  = 25 # Motor que rota las garras - Green wire
-TRIG  = 24 # Trigger pin for all ultrasonics - White Wire
-ECHO1 = 11 # Echo pin for Right US - Purple Wire
-ECHO2 = 9 # Echo pin for Center US - Purple Wire
-ECHO3 = 10 # Echo pin for Left US - Purple Wire
+TRIG  = 27 # Trigger pin for all ultrasonics - White Wire
+ECHO1 = 24 # Echo pin for Right US - Purple Wire
+ECHO2 = 23 # Echo pin for Center US - Purple Wire
+ECHO3 = 22 # Echo pin for Left US - Purple Wire
 
 milky = Robot(0.06, 0.29, 48*74.83, 0, 180, 100, 100)
 milky.setMotors(M1IN1, M1IN2, M2IN1, M2IN2)
@@ -28,9 +28,7 @@ milky.setIMU()
 milky.setUltrasonics(TRIG,ECHO1,ECHO2,ECHO3)
 
 clock = time()
-#milky.stateEstimate.yawOffset = 360 - milky.getYaw()
 milky.stateEstimate.yawOffset = milky.imu.getFirstYaw(50)
-#print(milky.imu.getFirstOrientation(250))
 print(time() - clock)
 print("CENTRO: ", milky.stateEstimate.yawOffset)
 navigation = Supervisor(milky)
@@ -38,8 +36,11 @@ i = 0
 oldClock = time()
 newClock = 0
 delta = 0
-sleep(0.2)
 while(True):
+	distances = milky.getUSDistances()
+	print("Distancias: ",distances)
+sleep(0.2)
+while(False):
 	newClock = time()
 	delta = newClock - oldClock
 	print(str(i))
